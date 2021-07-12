@@ -1,5 +1,5 @@
 {
-    "extends": ["plugin:prettier/recommended"],
+    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
     "plugins": ["prettier"],
     "rules": {
         "prettier/prettier": [
@@ -7,7 +7,8 @@
             {
                 "endOfLine": "auto"
             }
-        ]
+        ],
+        "no-unused-vars": "warn"
     },
 
     "parserOptions": {
@@ -15,6 +16,8 @@
     },
 
     "env": {
+        "browser": true,
+        "node": true,
         "es6": true
     }
 }
