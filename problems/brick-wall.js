@@ -5,30 +5,27 @@
  * @return {number}
  */
 const leastBricks = (wall) => {
-    // const getWidth = (row) => row.reduce((acc, val) => acc + val, 0);
+    const map = {};
 
-    let result = [];
+    wall.forEach((row) =>
+        row.reduce((acc, brick, index) => {
+            if (index === row.length - 1 && row.length > 1) return acc;
 
-    for (let i = 0; i < wall[0].reduce((acc, val) => acc + val); i++) {
-        let crossCount = 0;
+            const current = acc + brick;
 
-        wall.forEach((row) => {
-            let targetFits = false;
-            row.reduce((acc, brick) => {
-                if (targetFits) return acc;
+            if (current in map) {
+                map[current] += 1;
+            } else {
+                map[current] = 1;
+            }
 
-                const current = acc + brick;
-                if (current === i) targetFits = true;
-                return current;
-            }, 0);
+            return current;
+        }, 0)
+    );
 
-            if (!targetFits) crossCount++;
-        });
+    const result = wall.length - Math.max(...Object.values(map));
 
-        result.push(crossCount);
-    }
-
-    return Math.min(...result);
+    return result === 0 ? wall.length : result;
 };
 
 console.log(
@@ -46,4 +43,14 @@ console.log(leastBricks([[1], [1], [1]]));
 
 console.log(leastBricks([[1, 1], [2], [1, 1]]));
 
-console.log(leastBricks([[100000000], [100000000], [100000000]]));
+// console.log(leastBricks([[100000000], [100000000], [100000000]]));
+
+console.log(
+    leastBricks([
+        [9, 1],
+        [6, 3, 1],
+        [2, 4, 1, 3],
+    ])
+);
+
+console.log();
