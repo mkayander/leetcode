@@ -6,6 +6,7 @@
  */
 const leastBricks = (wall) => {
     const map = {};
+    let max = 0;
 
     wall.forEach((row) =>
         row.reduce((acc, brick, index) => {
@@ -19,13 +20,24 @@ const leastBricks = (wall) => {
                 map[current] = 1;
             }
 
+            max = Math.max(map[current], max);
+
             return current;
         }, 0)
     );
 
-    const result = wall.length - Math.max(...Object.values(map));
+    let isLong = false;
+    let prevValue;
 
-    return result === 0 ? wall.length : result;
+    wall.forEach((row, index) => {
+        if (index > 0 && row.length > 1 && prevValue !== row) isLong = true;
+
+        prevValue = row;
+    });
+
+    if (!isLong) return wall.length;
+
+    return wall.length - max;
 };
 
 console.log(
@@ -53,4 +65,22 @@ console.log(
     ])
 );
 
-console.log();
+console.log(
+    leastBricks([
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    ])
+);
+
+console.log(
+    leastBricks([
+        [6, 2, 2],
+        [1, 4, 4, 1],
+        [2, 5, 3],
+    ])
+);
+
+console.log(leastBricks([[79, 12, 208, 1]])); // Expected: 0
+
+console.log("");
