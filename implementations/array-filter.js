@@ -1,7 +1,7 @@
 Array.prototype.filter2 = function (cb) {
     const newArr = [];
-    for (const val of this) {
-        if (cb(val)) newArr.push(val);
+    for (const index in this) {
+        if (cb(this[index], index, this)) newArr.push(this[index]);
     }
     return newArr;
 };
