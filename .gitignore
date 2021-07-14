@@ -1,3 +1,6 @@
+# Compiled TypeScript
+out/
+
 # Logs
 logs
 *.log
