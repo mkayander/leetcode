@@ -7,9 +7,17 @@
         {
             "type": "pwa-node",
             "request": "launch",
-            "name": "Launch Program",
+            "name": "Brick Wall",
             "skipFiles": ["<node_internals>/**"],
             "program": "${workspaceFolder}\\problems\\brick-wall.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Array Filter TS",
+            "program": "${workspaceFolder}/implementations/array-filter.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"]
         }
     ]
 }
