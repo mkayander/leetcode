@@ -18,6 +18,14 @@
             "program": "${workspaceFolder}/implementations/array-filter.ts",
             "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": ["${workspaceFolder}/out/**/*.js"]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Best Time To Buy TS",
+            "program": "${workspaceFolder}/problems/121_BestTimeToBuyAndSellStock.ts",
+            "preLaunchTask": "tsc: build - tsconfig.json",
+            "outFiles": ["${workspaceFolder}/out/**/*.js"]
         }
     ]
 }
