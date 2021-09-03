@@ -1,14 +1,19 @@
-function sum(num) {
-    // if (typeof num === "number") {
-    return function (inp) {
-        console.log(`${num} + ${inp}`);
-        return sum(inp);
+const sum = (function () {
+    let result = 0;
+    return (num) => {
+        if (typeof num === "number" && !Number.isNaN(num)) {
+            return function (inp) {
+                console.log(`${num} + ${inp}`);
+                result = num;
+                return sum(inp + num);
+            };
+        }
+
+        console.log("Returning result!! - ", result);
+        return result;
     };
-    // }
+})();
 
-    // return (input) => num + input;
-}
-
-const result = sum(1)(5)(2)(3)();
+const result = sum(1)(5)(2)(3)(2)();
 console.log(result);
 console.log(typeof result);
