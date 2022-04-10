@@ -47,7 +47,7 @@ const checkCalls = () => {
     console.log("check 7");
 };
 
-checkCalls();
+// checkCalls();
 
 const fu = function () {
     const a = 1;
@@ -60,3 +60,41 @@ fu();
 
 localStorage.setItem("test1", "123");
 sessionStorage.setItem("test2", "321");
+
+const withDelay = (func, timeout) => {
+    return (...args) =>
+        new Promise((resolve) => {
+            setTimeout(() => resolve(func(...args)), timeout);
+        });
+};
+
+function loops() {
+    const obj1 = {
+        a: 123,
+        b: 12,
+        c: 23,
+        d: 15,
+    };
+
+    Object.defineProperty(obj1, "d", { value: obj1.d, enumerable: false });
+
+    for (const key in obj1) {
+        console.log(key);
+    }
+
+    const func = withDelay((a) => {
+        console.log(Object.getOwnPropertyDescriptors(a));
+    }, 600);
+
+    Object.entries(obj1).forEach(async (item, index) => {
+        console.log(`${index} started`);
+        await func(item);
+        console.log(`${index} ended`);
+    });
+
+    (async () => {
+        await Promise.all([func(obj1.a), func(obj1.b)]);
+    })();
+}
+
+loops();
