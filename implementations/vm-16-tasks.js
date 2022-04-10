@@ -361,3 +361,46 @@ const groupBy = (array, fn) =>
 
 groupBy([6.1, 4.2, 6.3], Math.floor); // -> { '4': [4.2], '6': [6.1, 6.3] }
 groupBy(["one", "two", "three"], "length"); // -> { '3': ['one', 'two'], '5': ['three'] }
+
+console.log("/// deepEqual ///");
+
+function deepEqual(a, b) {
+    // Compare 2 NaN;
+    if (Number.isNaN(a) && Number.isNaN(b)) {
+        return true;
+    }
+
+    // Always false if types are different
+    // If one of the params is undefined, we exit here
+    if (typeof a !== typeof b) {
+        return false;
+    }
+
+    // Compare primitive values
+    if (typeof a !== "object" || a === null || b === null) {
+        return a === b;
+    }
+
+    // Always false if object's keys counts are different
+    if (Object.keys(a).length !== Object.keys(b).length) {
+        return false;
+    }
+
+    // Call comparison for each member of the first object recursively
+    for (const key of Object.keys(a)) {
+        if (!deepEqual(a[key], b[key])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+const source = { a: 1, b: { c: 1 } };
+const test1 = { a: 1, b: { c: 1 } };
+const test2 = { a: 1, b: { c: 2 } };
+console.log(deepEqual(source, test1)); // -> true
+console.log(deepEqual(source, test2)); // -> false
+console.log(deepEqual(NaN, NaN)); // -> true
+console.log(deepEqual("test", "test!")); // -> false
+console.log(deepEqual()); // -> true
