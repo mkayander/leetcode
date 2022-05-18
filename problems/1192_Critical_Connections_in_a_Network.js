@@ -20,6 +20,7 @@ const criticalConnections = function (n, connections) {
 
     console.log("edgeMap: ", edgeMap);
 
+    // There's no big reason to use Uint32Array here, works with simple arrays too
     let disc = new Uint32Array(n),
         low = new Uint32Array(n),
         time = 1,
