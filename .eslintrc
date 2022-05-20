@@ -1,20 +1,20 @@
 {
-    "extends": ["eslint:recommended", "plugin:prettier/recommended"],
-    "plugins": ["prettier"],
+    "extends": ["eslint:recommended"],
+//    "plugins": ["prettier"],
     "rules": {
-        "prettier/prettier": [
-            "warn",
-            {
-                "endOfLine": "auto"
-            }
-        ],
+//        "prettier/prettier": [
+//            "warn",
+//            {
+//                "endOfLine": "auto"
+//            }
+//        ],
         "no-unused-vars": "warn",
         "no-empty": "warn",
         "no-plusplus": "off"
     },
 
     "parserOptions": {
-        "ecmaVersion": 2017
+        "ecmaVersion": 2020
     },
 
     "env": {
