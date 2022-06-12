@@ -12,8 +12,8 @@ const maximumUniqueSubarray = function(nums) {
         nmap[nums[right]]++;
         total += nums[right];
         while (nmap[nums[right]] > 1) {
-            total -= nums[left++];
             nmap[nums[left]]--;
+            total -= nums[left++];
         }
 
         best = Math.max(best, total);
