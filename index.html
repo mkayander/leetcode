@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <meta name="viewport" content="width=1440, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Leetcode</title>
 
         <link
@@ -16,7 +16,15 @@
         <script defer type="text/javascript" src="script.js"></script>
     </head>
     <body class="container pt-5" style="background: black; color: aliceblue">
-        <div id="divDepth">
+        <div id="controlled" class="d-flex flex-column gap-3">
+            <form id="my-form" class="d-flex flex-column gap-3">
+                <input class="input-group" name="count" type="number" value="0" />
+                <button class="btn btn-primary">Submit</button>
+            </form>
+            <button id="check-calls" class="btn btn-secondary">Check Calls</button>
+            <button id="promise-loop" class="btn btn-danger">Run Promise Loop</button>
+        </div>
+        <div id="divDepth" class="mt-5">
             <h1>Div Depth</h1>
             <div>
                 <div>

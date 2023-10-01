@@ -12,9 +12,7 @@ console.log(root);
 const maxDepth = (element, level) => {
     if (element.childElementCount === 0) return level;
 
-    return Math.max(
-        ...Array.from(element.children).map((el) => maxDepth(el, level + 1))
-    );
+    return Math.max(...Array.from(element.children).map((el) => maxDepth(el, level + 1)));
 };
 
 console.log(maxDepth(root, 0));
@@ -24,19 +22,25 @@ const checkCalls = () => {
         console.log("check 1");
     }, 0);
 
-    console.log("check 2");
-
     const a = new Promise((resolve) => {
         console.log("promise...");
         resolve(3);
+        console.log("promise... 2");
     });
 
     a.then((val) => console.log("check " + val));
 
-    console.log("check 4");
-
     const id = setInterval(() => {
         console.log("check 5");
+
+        const c = new Promise((resolve) => {
+            b.then((val) => {
+                console.log("check inside: " + val);
+                resolve(val);
+            });
+        });
+
+        c.then((val) => console.log("check " + val));
     }, 1000);
 
     setTimeout(() => {
@@ -44,10 +48,42 @@ const checkCalls = () => {
         console.log("check 6");
     }, 3000);
 
+    const b = new Promise((resolve) => {
+        resolve(4);
+    });
+
+    b.then((val) => console.log("check " + val));
+
     console.log("check 7");
 };
 
-// checkCalls();
+document.getElementById("check-calls").addEventListener("click", checkCalls);
+
+const promiseLoop = () => {
+    const targetCount = 20000;
+    let count = 0;
+
+    const handlePromise = (promise) => {
+        promise
+            .then((val) => {
+                count++;
+                console.log("promise " + val);
+            })
+            .finally(() => {
+                if (count < targetCount) handlePromise(promise);
+            });
+    };
+
+    const promise = new Promise((resolve) => {
+        setTimeout(() => {
+            resolve(1);
+        }, 1000);
+    });
+
+    handlePromise(promise);
+};
+
+document.getElementById("promise-loop").addEventListener("click", promiseLoop, true);
 
 const fu = function () {
     const a = 1;
