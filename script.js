@@ -134,3 +134,26 @@ function loops() {
 }
 
 loops();
+
+const someObj = {
+    a: 1,
+    f: () => {
+        return this.a;
+    },
+    f2: function () {
+        return this.a;
+    },
+};
+
+const secondObj = {
+    a: 2,
+    f: someObj.f,
+    f2: someObj.f2,
+};
+
+console.log(someObj.f());
+console.log(someObj.f2());
+
+console.log(secondObj.f());
+console.log(secondObj.f2());
+console.log(secondObj.f.bind({ a: 3 })());
