@@ -41,3 +41,19 @@ function runCode() {
 }
 
 runCode();
+
+async function fetchData(id) {
+    const data = await fetch(`https://jsonplaceholder.typicode.com/todos/${id}`);
+    return data.json();
+}
+
+async function recursive(id) {
+    const data = await fetchData(id);
+    const items = [data];
+    if (id < 10) {
+        items.push(...(await recursive(id + 1)));
+    }
+    return items;
+}
+
+recursive(1).then((data) => console.log(data));
