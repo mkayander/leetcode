@@ -36,6 +36,19 @@ console.log(secondObj.f2.bind({ a: 3 })());
 
 const thirdObject = { m: 1, n: 2, o: 3, p: 4 };
 
+Object.defineProperty(thirdObject, "r", {
+    enumerable: false,
+    writable: false,
+    configurable: false,
+    value: 5,
+});
+console.log(Object.getOwnPropertyDescriptors(thirdObject));
+
+thirdObject.r = 6;
+thirdObject.r = 10;
+delete thirdObject.r;
+console.log(thirdObject.r);
+
 for (const key in thirdObject) {
     console.log(key);
 }
@@ -109,9 +122,9 @@ console.log(null === null);
 
 console.log("5" == 5);
 console.log("" == []);
+console.log([] == "");
 console.log([] == 0);
 console.log([] == false);
-console.log([] == "");
 console.log([] == ![]);
 console.log([] == []);
 console.log([] == {});
@@ -224,3 +237,16 @@ new Promise((resolve, reject) => {
     .then((val) => {
         console.log(val);
     });
+
+function runTryCatch(a) {
+    try {
+        return a + 5;
+    } catch (e) {
+        console.error(e);
+    } finally {
+        console.log(a);
+        return a + 10;
+    }
+}
+
+console.log(runTryCatch(5));
