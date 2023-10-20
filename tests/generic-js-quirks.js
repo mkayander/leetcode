@@ -250,3 +250,13 @@ function runTryCatch(a) {
 }
 
 console.log(runTryCatch(5));
+
+function gcd(a, b) {
+    if (!b) {
+        return a;
+    }
+
+    return gcd(b, a % b);
+}
+
+console.log(gcd(44, 32));
