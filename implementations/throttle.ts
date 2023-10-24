@@ -1,26 +1,24 @@
-const withThrottle = <T extends Array<unknown>>(
-    fn: (...args: T) => void,
-    interval: number
-) => {
-    let counter = 1;
+type Callback = (...args: any[]) => void;
 
-    return (...args: T) => {
-        if (counter === interval) {
-            fn(...args);
-            counter = 1;
-        } else {
-            counter++;
+function throttle<T extends Callback>(fn: T, t: number) {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined = undefined;
+    let nextTimestamp = 0;
+
+    return function run(...args) {
+        const timestamp = Date.now();
+        if (timestamp < nextTimestamp) {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                run(...args);
+            }, nextTimestamp - timestamp);
+            return;
         }
-    };
-};
 
-const someFunc2 = (a: number, b: number) => {
-    console.log(a, b, a + b);
-};
+        nextTimestamp = timestamp + t;
+        fn(...args);
+    } as T;
+}
 
-const func2 = withThrottle(someFunc2, 2);
-
-func2(1, 2);
-func2(3, 4);
-func2(5, 6);
-func2(7, 8);
+const throttled = throttle(console.log, 100);
+throttled("log"); // logged immediately.
+throttled("log"); // logged at t=100ms.
