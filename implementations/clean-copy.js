@@ -52,3 +52,6 @@ brother.bar.baz = 255;
 console.log("-------------\n", "Results: ");
 console.log(brother, "\n", brother.bar.bib.car);
 console.log("initial: ", obj);
+
+// structured clone
+console.log(structuredClone(obj));
