@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>TreeWalker vs NodeIterator Benchmark</title>
+    </head>
+    <body>
+        <div id="test">
+            <!-- Sample nested elements to traverse -->
+            <div>
+                <p>Sample text 1</p>
+                <p>Sample text 2</p>
+                <div>
+                    <p>Sample text 3</p>
+                    <p>Sample text 4</p>
+                </div>
+            </div>
+            <div>
+                <p>Sample text 5</p>
+                <p>Sample text 6</p>
+                <div>
+                    <p>Sample text 7</p>
+                    <p>Sample text 8</p>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function benchmarkTreeWalker() {
+                let treeWalker = document.createTreeWalker(
+                    document.getElementById("test"), // Root node
+                    NodeFilter.SHOW_ELEMENT, // Show element nodes only
+                    {
+                        acceptNode: function (node) {
+                            return NodeFilter.FILTER_ACCEPT;
+                        },
+                    },
+                    false,
+                );
+
+                let count = 0;
+                let node = treeWalker.currentNode;
+                while (node) {
+                    count++;
+                    node = treeWalker.nextNode();
+                }
+                return count;
+            }
+
+            function benchmarkNodeIterator() {
+                let nodeIterator = document.createNodeIterator(
+                    document.getElementById("test"), // Root node
+                    NodeFilter.SHOW_ELEMENT, // Show element nodes only
+                    {
+                        acceptNode: function (node) {
+                            return NodeFilter.FILTER_ACCEPT;
+                        },
+                    },
+                );
+
+                let count = 0;
+                let node;
+                while ((node = nodeIterator.nextNode())) {
+                    count++;
+                }
+                return count;
+            }
+
+            console.time("TreeWalker");
+            benchmarkTreeWalker();
+            console.timeEnd("TreeWalker");
+
+            console.time("NodeIterator");
+            benchmarkNodeIterator();
+            console.timeEnd("NodeIterator");
+        </script>
+    </body>
+</html>
