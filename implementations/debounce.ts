@@ -1,8 +1,7 @@
-const withDebounce = <T extends Array<unknown>>(
-    fn: (...args: T) => void,
-    timeout: number
-) => {
-    let id: number | null = null;
+type TimeoutId = ReturnType<typeof setTimeout>;
+
+const withDebounce = <T extends Array<unknown>>(fn: (...args: T) => void, timeout: number) => {
+    let id: TimeoutId | null = null;
     return (...args: T) => {
         if (id !== null) clearTimeout(id);
 
