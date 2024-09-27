@@ -260,3 +260,17 @@ function gcd(a, b) {
 }
 
 console.log(gcd(44, 32));
+
+function scopes() {
+    try {
+        let a = 4;
+        if (a === 4) {
+            console.log(a);
+            let a = 5;
+        }
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+scopes();
