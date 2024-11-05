@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Builder API Sandbox</title>
+        <style>
+            body {
+                font-size: 24px;
+            }
+        </style>
+        <script defer type="text/javascript" src="runtime.js"></script>
+    </head>
+    <body>
+        <h4 style="margin: 10px 0">Expected</h4>
+        <div id="example-root" style="display: inline-flex; border: solid 1px black; border-radius: 5px; padding: 10px">
+            <!-- Квадрат -->
+            <div style="width: 100px; height: 100px; background-color: blue; margin-right: 14px"></div>
+            <!-- Круг -->
+            <div style="width: 100px; height: 100px; background-color: red; border-radius: 50%"></div>
+            <!-- Треугольник -->
+            <div
+                style="
+                    width: 0;
+                    height: 0;
+                    border-left: 50px solid transparent;
+                    border-right: 50px solid transparent;
+                    border-bottom: 100px solid green;
+                "
+            ></div>
+        </div>
+        <h4 style="margin: 10px 0">Your result</h4>
+        <div id="root"></div>
+
+        <script>
+            function solution() {
+                class DOMWorker {
+                    constructor(roots, prevContext = null) {
+                        this._roots = roots;
+                        this._prevContext = prevContext;
+                    }
+
+                    root(selector) {
+                        if (!this._roots) {
+                            this._roots = document.querySelectorAll(selector);
+                        }
+
+                        return this;
+                    }
+
+                    append(tag, attrs = {}) {
+                        if (!this._roots) return this;
+
+                        const { content, ...restAttrs } = attrs;
+                        const el = document.createElement(tag);
+                        if (content) {
+                            el.innerText = content;
+                        }
+                        if (restAttrs) {
+                            for (const key in restAttrs) {
+                                el.setAttribute(key, restAttrs[key]);
+                            }
+                        }
+
+                        for (const root of this._roots) {
+                            root.appendChild(el);
+                        }
+
+                        return this;
+                    }
+
+                    appendMany(count, tag, attrs) {
+                        for (let i = 0; i < count; i++) {
+                            this.append(tag, typeof attrs === "function" ? attrs(i) : attrs);
+                        }
+
+                        return this;
+                    }
+
+                    css(property, value) {
+                        if (!this._roots) return this;
+                        console.log("css: ", this, property, value);
+
+                        if (typeof property === "object") {
+                            for (const key in property) {
+                                this.css(key, property[key]);
+                            }
+                        } else {
+                            for (const root of this._roots) {
+                                root.style[property] = value;
+                            }
+                        }
+
+                        return this;
+                    }
+
+                    children(selector) {
+                        if (!this._roots) return this;
+
+                        const newRoots = [];
+                        for (const root of this._roots) {
+                            if (!selector) {
+                                newRoots.push(...root.children);
+                            } else {
+                                for (const child of root.children) {
+                                    if (child.matches(selector)) {
+                                        newRoots.push(child);
+                                    }
+                                }
+                            }
+                        }
+
+                        return new DOMWorker(newRoots, this);
+                    }
+
+                    select(selector) {
+                        if (!this._roots) return this;
+
+                        const newRoots = [];
+                        for (const root of this._roots) {
+                            newRoots.push(...root.querySelectorAll(selector));
+                        }
+
+                        return new DOMWorker(newRoots, this);
+                    }
+
+                    previousContext(steps = 1) {
+                        let result = this;
+                        while (result && steps > 0) {
+                            result = result._prevContext;
+                            steps--;
+                        }
+
+                        return result;
+                    }
+
+                    remove(selector) {
+                        if (!selector) {
+                            this._roots = [];
+                            return this;
+                        }
+                        if (!this._roots) return this;
+
+                        this._roots = this._roots.filter((root) => root.matches(selector));
+                    }
+                }
+
+                class Planner {
+                    _isDone = false;
+
+                    root() {
+                        if (!this._commands) {
+                            const task = new Planner();
+                            task._commands = [["root", arguments]];
+                            return task;
+                        }
+
+                        return this;
+                    }
+
+                    append() {
+                        if (this._isDone) return;
+                        this._commands.push(["append", arguments]);
+
+                        return this;
+                    }
+
+                    appendMany() {
+                        if (this._isDone) return;
+                        this._commands.push(["appendMany", arguments]);
+                        return this;
+                    }
+
+                    css() {
+                        if (this._isDone) return;
+                        this._commands.push(["css", arguments]);
+                        return this;
+                    }
+
+                    children() {
+                        if (this._isDone) return;
+                        this._commands.push(["children", arguments]);
+                        return this;
+                    }
+
+                    select() {
+                        if (this._isDone) return;
+                        this._commands.push(["select", arguments]);
+                        return this;
+                    }
+
+                    previousContext() {
+                        if (this._isDone) return;
+                        this._commands.push(["previousContext", arguments]);
+                        return this;
+                    }
+
+                    remove() {
+                        if (this._isDone) return;
+                        this._commands.push(["remove"]);
+                        return this;
+                    }
+
+                    commit() {
+                        if (this._isDone) return;
+                        this._isDone = true;
+
+                        let current = new DOMWorker();
+
+                        for (const [command, args] of this._commands) {
+                            // console.log(current, command, args);
+                            current = current[command](...args);
+                        }
+                    }
+                }
+
+                return new Planner();
+            }
+
+            const builder = solution();
+            builder
+                .root("#root")
+                .css({ border: "solid 1px black", borderRadius: "5px", padding: "10px", display: "inline-flex" })
+                .append("div", { id: "square" })
+                .children("#square")
+                .css({ width: "100px", height: "100px", backgroundColor: "blue", marginRight: "14px" })
+                .previousContext()
+                .append("div", { id: "circle" })
+                .children("#circle")
+                .css({ width: "100px", height: "100px", backgroundColor: "red", borderRadius: "50%" })
+                .previousContext()
+                .append("div", { id: "triangle" })
+                .children("#triangle")
+                .css({
+                    width: "0",
+                    height: "0",
+                    borderLeft: "50px solid transparent",
+                    borderRight: "50px solid transparent",
+                    borderBottom: "100px solid green",
+                })
+                .commit();
+
+            function getLinksFromHTML(html) {
+                if (!html) return [];
+
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+                const links = Array.from(doc.querySelectorAll("a")).map((anchor) => anchor.href);
+
+                return links;
+            }
+
+            function findShortestPath(firstUrl, lastUrl, maxDepth, fetchSync) {
+                const prevMap = new Map();
+                prevMap.set(firstUrl, null);
+
+                let depth = 1;
+                let queue = [firstUrl];
+                main: while (queue.length && depth <= maxDepth) {
+                    const nextQueue = [];
+
+                    for (const url of queue) {
+                        const response = fetchSync(url);
+                        const links = getLinksFromHTML(response);
+                        for (const link of links) {
+                            if (prevMap.has(link)) continue;
+                            prevMap.set(link, url);
+
+                            if (link === lastUrl) {
+                                break main;
+                            }
+                            nextQueue.push(link);
+                        }
+                    }
+
+                    queue = nextQueue;
+                    depth++;
+                }
+
+                if (!prevMap.has(lastUrl)) return null;
+
+                const result = [];
+                let current = lastUrl;
+                while (current) {
+                    result.push(current);
+                    current = prevMap.get(current);
+                }
+
+                return result.reverse();
+            }
+
+            function test() {
+                function mockFetchSync(url) {
+                    const pages = {
+                        "http://example.com": '<a href="http://example.com/page1">Page 1</a>',
+                        "http://example.com/page1": '<a href="http://example.com/page2">Page 2</a>',
+                        "http://example.com/page2": '<a href="http://example.com/page3">Page 3</a>',
+                        "http://example.com/page3": '<a href="http://example.com/page4">Page 4</a>',
+                        "http://example.com/page4": '<a href="http://example.com/page5">Page 5</a>',
+                        "http://example.com/page5": '<a href="http://example.com/page6">Page 6</a>',
+                        "http://example.com/page6": '<a href="http://example.com/page7">Page 7</a>',
+                        "http://example.com/page7": '<a href="http://example.com/page8">Page 8</a>',
+                        "http://example.com/page8": '<a href="http://example.com/page9">Page 9</a>',
+                        "http://example.com/page9": '<a href="http://example.com/page10">Page 10</a>',
+                        "http://example.com/page10": '<a href="http://example.com/page11">Page 11</a>',
+                        "http://example.com/page11": '<a href="http://example.com/page12">Page 12</a>',
+                        "http://example.com/page12": '<a href="http://example.com/page13">Page 13</a>',
+                        "http://example.com/page13": '<a href="http://example.com/page14">Page 14</a>',
+                        "http://example.com/page14": '<a href="http://example.com/page15">Page 15</a>',
+                        "http://example.com/page15": '<a href="http://example.com/page16">Page 16</a>',
+                        "http://example.com/page16": '<a href="http://example.com/page17">Page 17</a>',
+                        "http://example.com/page17": '<a href="http://example.com/page18">Page 18</a>',
+                        "http://example.com/page18": '<a href="http://example.com/page19">Page 19</a>',
+                        "http://example.com/page19": '<a href="http://example.com/page20">Page 20</a>',
+                        "http://example.com/page20": '<a href="http://example.com/page21">Page 21</a>',
+                        "http://example.com/page21": '<a href="http://example.com/page22">Page 22</a>',
+                        "http://example.com/page22": '<a href="http://example.com/page23">Page 23</a>',
+                        "http://example.com/page23": '<a href="http://example.com/page24">Page 24</a>',
+                        "http://example.com/page24": '<a href="http://example.com/page25">Page 25</a>',
+                        "http://example.com/page25": '<a href="http://example.com/page26">Page 26</a>',
+                        "http://example.com/page26": '<a href="http://example.com/page27">Page 27</a>',
+                        "http://example.com/page27": '<a href="http://example.com/page28">Page 28</a>',
+                        "http://example.com/page28": '<a href="http://example.com/page29">Page 29</a>',
+                        "http://example.com/page29": '<a href="http://example.com/page30">Page 30</a>',
+                        "http://example.com/page30": '<a href="http://example.com/page31">Page 31</a>',
+                        "http://example.com/page31": '<a href="http://example.com/page32">Page 32</a>',
+                        "http://example.com/page32": '<a href="http://example.com/page33">Page 33</a>',
+                        "http://example.com/page33": '<a href="http://example.com/page34">Page 34</a>',
+                        "http://example.com/page34": '<a href="http://example.com/page35">Page 35</a>',
+                        "http://example.com/page35": '<a href="http://example.com/page36">Page 36</a>',
+                        "http://example.com/page36": '<a href="http://example.com/page37">Page 37</a>',
+                        "http://example.com/page37": '<a href="http://example.com/page38">Page 38</a>',
+                        "http://example.com/page38": '<a href="http://example.com/page39">Page 39</a>',
+                        "http://example.com/page39": '<a href="http://example.com/page40">Page 40</a>',
+                        "http://example.com/page40": '<a href="http://example.com/page41">Page 41</a>',
+                        "http://example.com/page41": '<a href="http://example.com/page42">Page 42</a>',
+                        "http://example.com/page42": '<a href="http://example.com/page43">Page 43</a>',
+                        "http://example.com/page43": '<a href="http://example.com/page44">Page 44</a>',
+                        "http://example.com/page44": '<a href="http://example.com/page45">Page 45</a>',
+                        "http://example.com/page45": '<a href="http://example.com/page46">Page 46</a>',
+                        "http://example.com/page46": '<a href="http://example.com/page47">Page 47</a>',
+                        "http://example.com/page47": '<a href="http://example.com/page48">Page 48</a>',
+                        "http://example.com/page48": '<a href="http://example.com/page49">Page 49</a>',
+                        "http://example.com/page49": '<a href="http://example.com/page50">Page 50</a>',
+                    };
+
+                    return pages[url] || "";
+                }
+                const expectedPath = [
+                    "http://example.com",
+                    "http://example.com/page1",
+                    "http://example.com/page2",
+                    "http://example.com/page3",
+                    "http://example.com/page4",
+                    "http://example.com/page5",
+                    "http://example.com/page6",
+                    "http://example.com/page7",
+                    "http://example.com/page8",
+                    "http://example.com/page9",
+                    "http://example.com/page10",
+                ];
+
+                const firstUrl = "http://example.com";
+                const lastUrl = "http://example.com/page10";
+                const maxDepth = 10;
+                const result = findShortestPath(firstUrl, lastUrl, maxDepth, mockFetchSync);
+                console.log(result);
+            }
+
+            test();
+        </script>
+    </body>
+</html>
